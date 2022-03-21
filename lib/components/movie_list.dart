@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:yote_shin_application/models/movie.dart';
 import 'package:yote_shin_application/networks/api.dart';
@@ -43,7 +44,10 @@ class _MovieListState extends State<MovieList> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => DetailPage(movie: movie)));
+                              builder: (context) => DetailPage(
+                                    movie: movie,
+                                    heroTag: '${movie.id}' + widget.title,
+                                  )));
                     }),
                     child: SizedBox(
                       width: 125,
@@ -59,13 +63,20 @@ class _MovieListState extends State<MovieList> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               SizedBox(
-                                height: 170,
-                                width: 220,
-                                child: Image.network(
-                                  API.imageURL + movie.posterPath,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
+                                  height: 170,
+                                  width: 220,
+                                  child: Hero(
+                                      tag: '${movie.id}' + widget.title,
+                                      child: CachedNetworkImage(
+                                        imageUrl:
+                                            API.imageURL + movie.posterPath!,
+                                        fit: BoxFit.contain,
+                                        placeholder: (context, url) =>
+                                            Image.asset(
+                                          'assets/images/cover.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ))),
                               Container(
                                 padding:
                                     const EdgeInsets.only(right: 10, top: 3),

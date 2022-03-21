@@ -1,12 +1,15 @@
-import 'package:flutter/material.dart';
 
-import 'package:yote_shin_application/networks/api.dart';
+import 'package:flutter/material.dart';
+import 'package:yote_shin_application/components/poster.dart';
+
+
 
 import '../models/movie.dart';
 import '../pages/detail_page.dart';
 
 class SearchList extends StatefulWidget {
   List<Movie> list;
+
   SearchList({Key? key, required this.list}) : super(key: key);
 
   @override
@@ -31,7 +34,10 @@ class _SearchListState extends State<SearchList> {
                         ? const Center(
                             child: CircularProgressIndicator(),
                           )
-                        : DetailPage(movie: m)));
+                        : DetailPage(
+                            movie: m,
+                            heroTag: '${m.id}' + m.title,
+                          )));
           }),
           child: Container(
             width: 200,
@@ -49,12 +55,10 @@ class _SearchListState extends State<SearchList> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(
-                    height: 150,
-                    child: Image.network(
-                      API.imageURL + m.posterPath,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                      height: 150,
+                      child: Hero(
+                          tag: '${m.id}' + m.title,
+                          child: Poster(posterPath: m.posterPath))),
                   const SizedBox(
                     width: 12,
                   ),
@@ -62,7 +66,7 @@ class _SearchListState extends State<SearchList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width: 150,
+                        width: 200,
                         child: Text(
                           m.title,
                           maxLines: 2,
@@ -71,6 +75,16 @@ class _SearchListState extends State<SearchList> {
                               fontWeight: FontWeight.bold, fontSize: 16),
                         ),
                       ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      m.releaseDate != null
+                          ? Text(
+                              '${m.releaseDate!.year}',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16),
+                            )
+                          : const Text(''),
                       const SizedBox(
                         height: 10.0,
                       ),

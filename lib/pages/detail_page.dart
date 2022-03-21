@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:yote_shin_application/components/blur_background.dart';
+import 'package:yote_shin_application/components/cast.dart';
 import 'package:yote_shin_application/models/movie.dart';
 
 import '../models/cast.dart';
@@ -7,7 +9,9 @@ import '../networks/api.dart';
 
 class DetailPage extends StatefulWidget {
   final Movie movie;
-  DetailPage({Key? key, required this.movie}) : super(key: key);
+  String heroTag = '';
+  DetailPage({Key? key, required this.movie, required this.heroTag})
+      : super(key: key);
 
   @override
   State<DetailPage> createState() => _DetailPageState();
@@ -37,25 +41,29 @@ class _DetailPageState extends State<DetailPage> {
                     width: 120,
                     height: 150,
                     child: Card(
-                      elevation: 8.0,
-                      shadowColor: Colors.orange,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20.0),
-                      ),
-                      clipBehavior: Clip.antiAliasWithSaveLayer,
-                      child: Image.network(
-                        API.imageURL200 + widget.movie.posterPath,
-                        fit: BoxFit.fill,
-                      ),
-                    )),
+                        elevation: 8.0,
+                        shadowColor: Colors.orange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
+                        ),
+                        clipBehavior: Clip.antiAliasWithSaveLayer,
+                        child: Hero(
+                          tag: widget.heroTag,
+                          child: Image(
+                            image: CachedNetworkImageProvider(
+                              API.imageURL200 + widget.movie.posterPath!,
+                            ),
+                            fit: BoxFit.fill,
+                          ),
+                        ))),
                 const SizedBox(width: 5.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 230,
+                    SizedBox(
+                      width: 220,
                       child: Text(
-                        '${widget.movie} (${widget.movie.releaseDate!.year})',
+                        '${widget.movie.title} (${widget.movie.releaseDate!.year})',
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -101,23 +109,80 @@ class _DetailPageState extends State<DetailPage> {
         ),
       );
 
-  _castInformation() => SizedBox(
-        width: double.infinity,
-        height: 200,
-        child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: casts!.length,
-            itemBuilder: (BuildContext context, int index) {
-              Cast c = casts![index];
-              return (Column(
-                children: [
-                  Image.network(
-                    API.imageURL + c.profilePath!,
-                    width: 100,
-                  )
-                ],
-              ));
-            }),
+  _castInformation() => Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Casts',
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            height: 260,
+            child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                physics: BouncingScrollPhysics(),
+                itemCount: casts!.length,
+                itemBuilder: (BuildContext context, index) {
+                  Cast c = casts![index];
+                  return SizedBox(
+                    width: 125,
+                    child: Card(
+                      elevation: 7.0,
+                      shadowColor: Colors.orange,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          c.profilePath == null
+                              ? Image.asset(
+                                  'assets/images/cast.png',
+                                  height: 180,
+                                  width: 230,
+                                  fit: BoxFit.cover,
+                                )
+                              : CastPic(profilePath: c.profilePath!),
+                          const SizedBox(
+                            height: 5.0,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5.0),
+                            child: Text(
+                              c.originalName,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 100,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 5.0, top: 3.0),
+                              child: Text(
+                                c.character,
+                                maxLines: 2,
+                                style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 13.0,
+                                    overflow: TextOverflow.ellipsis),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                }),
+          )
+        ]),
       );
 
   @override
@@ -130,18 +195,24 @@ class _DetailPageState extends State<DetailPage> {
           backgroundColor: Colors.transparent,
         ),
         body: Stack(children: [
-          BlurBackGround(
-            backdropPath: widget.movie.backdropPath,
-          ),
-          Column(
-            children: [
-              _movieInformation(),
-              casts == null
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : _castInformation()
-            ],
+          widget.movie.backdropPath != null
+              ? BlurBackGround(
+                  backdropPath: widget.movie.backdropPath!,
+                )
+              : const Center(
+                  child: Text('Empty'),
+                ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                _movieInformation(),
+                casts == null
+                    ? const Center(
+                        child: CircularProgressIndicator(),
+                      )
+                    : _castInformation()
+              ],
+            ),
           )
         ]));
   }
