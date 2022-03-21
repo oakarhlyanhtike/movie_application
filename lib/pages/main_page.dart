@@ -52,15 +52,17 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Movie App"),
+          title: const Text("Movie Application"),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 10.0),
               child: IconButton(
                   iconSize: 30,
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => const SearchPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SearchPage()));
                   },
                   icon: const Icon(Icons.search)),
             )
