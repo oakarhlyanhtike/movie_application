@@ -1,9 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:yote_shin_application/components/poster.dart';
-
-
-
 import '../models/movie.dart';
 import '../pages/detail_page.dart';
 
@@ -27,17 +24,12 @@ class _SearchListState extends State<SearchList> {
 
         return InkWell(
           onTap: (() {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => widget.list == null
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : DetailPage(
-                            movie: m,
-                            heroTag: '${m.id}' + m.title,
-                          )));
+            Get.to(() => DetailPage(
+                  movie: m,
+                  heroTag: '${m.id}' + m.title,
+                ));
+
+           
           }),
           child: Container(
             width: 200,

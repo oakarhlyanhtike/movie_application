@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:yote_shin_application/models/movie.dart';
 import 'package:yote_shin_application/networks/api.dart';
 import 'package:yote_shin_application/pages/detail_page.dart';
@@ -38,16 +39,14 @@ class _MovieListState extends State<MovieList> {
                 itemCount: widget.list.length,
                 itemBuilder: (BuildContext context, index) {
                   Movie movie = widget.list[index];
-                  print('Movie is $movie');
+
                   return InkWell(
                     onTap: (() {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DetailPage(
-                                    movie: movie,
-                                    heroTag: '${movie.id}' + widget.title,
-                                  )));
+                      Get.to(() => DetailPage(
+                            movie: movie,
+                            heroTag: '${movie.id}' + widget.title,
+                          )
+                          );
                     }),
                     child: SizedBox(
                       width: 125,

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:yote_shin_application/components/blur_background.dart';
 import 'package:yote_shin_application/components/cast.dart';
+import 'package:yote_shin_application/controller/detail_controller.dart';
 import 'package:yote_shin_application/models/movie.dart';
 
 import '../models/cast.dart';
@@ -19,16 +21,17 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   var api = API();
-  List<Cast>? casts;
+  //List<Cast>? casts;
+  final DeatilController d = Get.put(DeatilController());
   @override
   void initState() {
-    api.getCast(widget.movie.id).then((value) {
-      setState(() {
-        casts = value;
-      });
-    });
+    d.loadCast(widget.movie.id);
     super.initState();
   }
+
+  Widget _popularList() => d.casts.isEmpty
+      ? const Center(child: CircularProgressIndicator())
+      : _castInformation();
 
   _movieInformation() => Padding(
         padding: const EdgeInsets.only(top: 100, left: 10),
@@ -126,9 +129,9 @@ class _DetailPageState extends State<DetailPage> {
                 scrollDirection: Axis.horizontal,
                 shrinkWrap: true,
                 physics: BouncingScrollPhysics(),
-                itemCount: casts!.length,
+                itemCount: d.casts.length,
                 itemBuilder: (BuildContext context, index) {
-                  Cast c = casts![index];
+                  Cast c = d.casts[index];
                   return SizedBox(
                     width: 125,
                     child: Card(
@@ -194,26 +197,28 @@ class _DetailPageState extends State<DetailPage> {
           elevation: 0,
           backgroundColor: Colors.transparent,
         ),
-        body: Stack(children: [
-          widget.movie.backdropPath != null
-              ? BlurBackGround(
-                  backdropPath: widget.movie.backdropPath!,
-                )
-              : const Center(
-                  child: Text('Empty'),
-                ),
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                _movieInformation(),
-                casts == null
-                    ? const Center(
-                        child: CircularProgressIndicator(),
-                      )
-                    : _castInformation()
-              ],
-            ),
-          )
-        ]));
+        body: Obx(() {
+          return Stack(children: [
+            widget.movie.backdropPath != null
+                ? BlurBackGround(
+                    backdropPath: widget.movie.backdropPath!,
+                  )
+                : const Center(
+                    child: Text('Empty'),
+                  ),
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  _movieInformation(),
+                  d.casts == null
+                      ? const Center(
+                          child: CircularProgressIndicator(),
+                        )
+                      : _castInformation()
+                ],
+              ),
+            )
+          ]);
+        }));
   }
 }
